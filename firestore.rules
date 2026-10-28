@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only these Google accounts can read or change the app's data.
+    // Use lowercase Gmail addresses.
+    function allowed() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in [
+          'HER_EMAIL@gmail.com',
+          'YOUR_EMAIL@gmail.com'
+        ];
+    }
+
+    match /sitter/{path=**} {
+      allow read, write: if allowed();
+    }
+  }
+}
